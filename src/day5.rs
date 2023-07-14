@@ -24,7 +24,7 @@ fn parse_move(mv: &str) -> Result<Move, anyhow::Error> {
 }
 
 fn make_move(amount: usize, from: usize, to: usize, stacker: &mut Vec<Vec<char>>) {
-    for i in 0..amount {
+    for _ in 0..amount {
         let from = stacker.get_mut(from).unwrap();
         if let Some(c) = from.pop() {
             stacker.get_mut(to).unwrap().push(c);
@@ -32,6 +32,24 @@ fn make_move(amount: usize, from: usize, to: usize, stacker: &mut Vec<Vec<char>>
             panic!("should POP!")
         }
     }
+}
+
+fn make_multi_move(amount: usize, from: usize, to: usize, stacker: &mut Vec<Vec<char>>) {
+    let mut moves = vec![];
+
+    for _ in 0..amount {
+        let from = stacker.get_mut(from).unwrap();
+        if let Some(c) = from.pop() {
+            moves.push(c);
+        } else {
+            panic!("should POP!")
+        }
+    }
+
+    moves.reverse();
+    moves.iter().for_each(|mv| {
+        stacker.get_mut(to).unwrap().push(*mv);
+    })
 }
 
 pub fn day5() {
@@ -65,7 +83,7 @@ pub fn day5() {
     file.lines().for_each(|line| {
         if is_moving {
             let mv = parse_move(line).expect("should parse every move");
-            make_move(mv.amount, mv.from, mv.to, &mut stacker);
+            make_multi_move(mv.amount, mv.from, mv.to, &mut stacker);
         }
 
         if line.is_empty() {
